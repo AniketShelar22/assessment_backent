@@ -1,22 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // Load .env variables
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // To handle JSON data in requests
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+}).then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("Mongo Error:", err));
 
-// User Schema and Model
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: String,
   email: String,
   address: String,
@@ -29,25 +25,51 @@ const userSchema = new mongoose.Schema({
   profileImage: String,
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', UserSchema);
 
-// API Route - Get all users
+// ✅ Route to fetch users
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching users' });
+    console.error("Fetch error:", error);
+    res.status(500).json({ error: "Error fetching users" });
   }
 });
 
-// Root route for testing
-app.get('/', (req, res) => {
-  res.send('Server is running ✅');
+// ✅ Optional route to seed users
+app.get('/api/users/seed', async (req, res) => {
+  try {
+    await User.deleteMany(); // Clear previous data
+
+    const sampleUsers = [
+      {
+        name: "John Doe",
+        email: "john@example.com",
+        address: "123 Main St",
+        phone: "123-456-7890",
+        website: "johndoe.com",
+        company: { name: "Doe Inc", slogan: "We Do It!" },
+        profileImage: "https://randomuser.me/api/portraits/men/1.jpg"
+      },
+      {
+        name: "Jane Smith",
+        email: "jane@example.com",
+        address: "456 Side St",
+        phone: "987-654-3210",
+        website: "janesmith.com",
+        company: { name: "Smith Co", slogan: "Smarter Solutions" },
+        profileImage: "https://randomuser.me/api/portraits/women/2.jpg"
+      }
+    ];
+
+    await User.insertMany(sampleUsers);
+    res.json({ message: "Users seeded!" });
+  } catch (error) {
+    console.error("Seed error:", error);
+    res.status(500).json({ error: "Error seeding users" });
+  }
 });
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(5000, () => console.log("Server running on port 5000"));
