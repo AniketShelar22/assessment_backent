@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = expresss();
 app.use(cors());
 
-mongoose.connect('mongodb+srv://aniketshelar2212002:Skaa7Fx4LuyMwHhj@cluster0.7zmxjvu.mongodb.net/cardDB?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://aniketshelar2212002:mFWTIGXDGsqutuGj@cluster0.oog4qfk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
